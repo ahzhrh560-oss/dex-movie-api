@@ -1,0 +1,13 @@
+{
+  "name": "dex-movie-api",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "DEX MOVIE — Streaming API",
+  "dependencies": {
+    "vidsrc-bypass": "^1.0.0",
+    "@definisi/vidsrc-scraper": "^1.0.0"
+  },
+  "engines": {
+    "node": ">=18.x"
+  }
+}
