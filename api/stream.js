@@ -1,5 +1,5 @@
 import {
-  getConsumetFlixHQ,
+  getFlixHQ,
   getVidSrcNet,
   get2Embed,
   getAutoEmbed,
@@ -19,7 +19,7 @@ export default async function handler(req, res) {
   const tmdbKey = process.env.TMDB_KEY || '7f74dd818170c3ca2bdf4e35a10ee2eb';
 
   const results = await Promise.allSettled([
-    getConsumetFlixHQ(id, type, season, episode, tmdbKey),
+    getFlixHQ(id, type, season, episode, tmdbKey),
     getVidSrcNet(id, type, season, episode),
     getVidSrcXyz(id, type, season, episode),
     get2Embed(id, type, season, episode),
