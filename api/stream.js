@@ -1,13 +1,10 @@
 // ============================================
 // DEX MOVIE — Main Stream API
-// GET /api/stream?id=693134&type=movie
-// GET /api/stream?id=1396&type=tv&s=1&e=1
 // ============================================
 
-import { getVidLink, getEmbedSu, getVidSrcRip, getVidSrcIcu } from '../lib/scraper.js';
+import { getVidSrcNet, getVidSrcXyz, get2Embed, getAutoEmbed } from '../lib/scraper.js';
 
 export default async function handler(req, res) {
-  // CORS — اسمح لأي دومين
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -19,34 +16,26 @@ export default async function handler(req, res) {
   const { id, type = 'movie', s, e } = req.query;
 
   if (!id) {
-    return res.status(400).json({
-      success: false,
-      error: 'id parameter is required'
-    });
+    return res.status(400).json({ success: false, error: 'id parameter is required' });
   }
 
   const season = s ? parseInt(s) : null;
   const episode = e ? parseInt(e) : null;
 
-  // تحقق من المسلسل
   if (type === 'tv' && (!season || !episode)) {
-    return res.status(400).json({
-      success: false,
-      error: 'season and episode required for tv'
-    });
+    return res.status(400).json({ success: false, error: 'season and episode required for tv' });
   }
 
-  // اجلب من كل المصادر بالتوازي
   const startTime = Date.now();
 
+  // اجلب من كل المصادر بالتوازي
   const results = await Promise.allSettled([
-    getVidLink(id, type, season, episode),
-    getEmbedSu(id, type, season, episode),
-    getVidSrcRip(id, type, season, episode),
-    getVidSrcIcu(id, type, season, episode)
+    getVidSrcNet(id, type, season, episode),
+    getVidSrcXyz(id, type, season, episode),
+    get2Embed(id, type, season, episode),
+    getAutoEmbed(id, type, season, episode)
   ]);
 
-  // فلتر الناجح
   const sources = results
     .filter(r => r.status === 'fulfilled' && r.value && r.value.url)
     .map(r => r.value);
@@ -57,20 +46,13 @@ export default async function handler(req, res) {
     return res.status(404).json({
       success: false,
       error: 'No sources available',
-      id,
-      type,
-      season,
-      episode,
-      elapsed
+      id, type, season, episode, elapsed
     });
   }
 
   return res.status(200).json({
     success: true,
-    id,
-    type,
-    season,
-    episode,
+    id, type, season, episode,
     sources,
     count: sources.length,
     elapsed
